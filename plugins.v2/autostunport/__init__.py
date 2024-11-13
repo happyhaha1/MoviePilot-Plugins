@@ -1,25 +1,9 @@
-import datetime
-import re
-import threading
-import traceback
-from pathlib import Path
 from typing import List, Tuple, Dict, Any, Optional
 
-import pytz
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
-from watchdog.observers.polling import PollingObserver
 
 from app import schemas
 from app.core.config import settings
-from app.core.event import eventmanager, Event
-from app.log import logger
 from app.plugins import _PluginBase
-from app.schemas import NotificationType
-from app.schemas.types import EventType
-from app.utils.system import SystemUtils
 
 
 class AutoStunPort(_PluginBase):
@@ -78,6 +62,102 @@ class AutoStunPort(_PluginBase):
             "methods": ["GET"],
             "summary": "更新 ip 以及端口",
         }]
+
+    @staticmethod
+    def get_command() -> List[Dict[str, Any]]:
+        pass
+
+    def get_form(self) -> Tuple[List[dict], Dict[str, Any]]:
+        return [
+            {
+                'component': 'VForm',
+                'content': [
+                    {
+                        'component': 'VRow',
+                        'content': [
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12,
+                                    'md': 6
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VTextField',
+                                        'props': {
+                                            'model': 'ip',
+                                            'label': 'IP 地址',
+                                            'placeholder': '0.0.0.0/24'
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12,
+                                    'md': 6
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VTextField',
+                                        'props': {
+                                            'model': 'port',
+                                            'label': ' 端口',
+                                            'placeholder': '0-65535'
+                                        }
+                                    }
+                                ]
+                            },
+                        ]
+                    },
+                    {
+                        'component': 'VRow',
+                        'content': [
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12,
+                                    'md': 4
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VTextField',
+                                        'props': {
+                                            'model': 'method',
+                                            'label': 'ss的method',
+                                            'placeholder': 'aes-256-gcm'
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12,
+                                    'md': 4
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VTextField',
+                                        'props': {
+                                            'model': 'password',
+                                            'label': '密码',
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+            }
+        ], {
+            'ip': '',
+            '_port': '',
+            'method': '',
+            'password': ''
+        }
+
 
     def change_ip_port(self, apikey: str, ip: str, port: str):
         if apikey != settings.API_TOKEN:
