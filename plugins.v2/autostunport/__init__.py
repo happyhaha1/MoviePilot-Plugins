@@ -1,9 +1,14 @@
 from typing import List, Tuple, Dict, Any, Optional
 
+from fastapi import Response
+
+import requests
 import base64
 from app import schemas
 from app.core.config import settings
 from app.plugins import _PluginBase
+from app.log import logger
+from app.schemas import NotificationType
 
 
 class AutoStunPort(_PluginBase):
@@ -33,6 +38,7 @@ class AutoStunPort(_PluginBase):
     _port = None
     _method = None
     _password = None
+    _sub_store_url = None
 
     def init_plugin(self, config: dict = None):
         if config:
@@ -41,6 +47,7 @@ class AutoStunPort(_PluginBase):
             self._port = config.get('port')
             self._method = config.get('method')
             self._password = config.get('password')
+            self._sub_store_url = config.get('sub_store_url')
 
     def get_api(self) -> List[Dict[str, Any]]:
         """
@@ -140,11 +147,15 @@ class AutoStunPort(_PluginBase):
                                 },
                                 'content': [
                                     {
-                                        'component': 'VTextField',
+                                        'component': 'VSelect',
                                         'props': {
                                             'model': 'method',
-                                            'label': 'ss的method',
-                                            'placeholder': 'aes-256-gcm'
+                                            'label': '加密方式',
+                                            'items': [
+                                                {'title': 'aes-256-gcm', 'value': 'aes-256-gcm'},
+                                                {'title': 'aes-128-gcm', 'value': 'aes-128-gcm'},
+                                                {'title': 'aes-192-gcm', 'value': 'aes-192-gcm'},
+                                            ]
                                         }
                                     }
                                 ]
@@ -164,6 +175,22 @@ class AutoStunPort(_PluginBase):
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12,
+                                    'md': 4
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VTextField',
+                                        'props': {
+                                            'model': 'sub_store_url',
+                                            'label': '订阅通知地址',
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -174,28 +201,57 @@ class AutoStunPort(_PluginBase):
             'ip': self._ip,
             '_port': self._port,
             'method': self._method,
-            'password': self._password
+            'password': self._password,
+            'sub_store_url': self._sub_store_url
         }
 
     def change_ip_port(self, apikey: str, ip: str, port: str):
         if apikey != settings.API_TOKEN:
             return schemas.Response(success=False, message="API密钥错误")
+        if not self._enabled:
+            return schemas.Response(success=False, message="服务未启用")
         self._ip = ip
         self._port = port
+
+        self._update_config()
+        self.post_message(mtype=NotificationType.Plugin,title=f"【自动更新STUN端口】", text=f"STUN 端口变更为{self._ip}:{self._port}")
+        logger.info(f"Stun服务已更新为 {self._ip}:{self._port}")
+        # 发送 http 请求
+        if self._sub_store_url:
+            try:
+                response = requests.get(self._sub_store_url)
+                if response.status_code == 200:
+                    logger.info(f"请求{self._sub_store_url}成功")
+                else:
+                    logger.error(f"请求{self._sub_store_url}失败，状态码：{response.text}")
+            except requests.RequestException as e:
+                # print("请求异常：", e)
+                logger.error(f"请求SubStore异常：{e}")
+        else:
+            logger.info('未设置订阅通知地址')
+        return schemas.Response(success=True, message="STUN 端口更新成功")
+
+    def _update_config(self):
         config = {
+            "enabled": self._enabled,
             "ip": self._ip,
             "port": self._port,
+            "method": self._method,
+            "password": self._password,
+            "sub_store_url": self._sub_store_url
         }
         self.update_config(config=config)
-        return schemas.Response(success=True)
 
     def get_ip_port(self, apikey: str):
         if apikey != settings.API_TOKEN:
             return schemas.Response(success=False, message="API密钥错误")
+        if not self._enabled:
+            return schemas.Response(success=False, message="服务未启用")
         url = f"{self._method}:{self._password}@{self._ip}:{self._port}"
         # base64编码
         url_base64 = base64.b64encode(url.encode('utf-8')).decode('utf-8')
-        return f"ss://{url_base64}#stun回家"
+        res = base64.b64encode(f"ss://{url_base64}#Stun回家".encode('utf-8')).decode('utf-8')
+        return Response(content=res, media_type="text/plain")
 
     def get_page(self) -> List[dict]:
         pass
