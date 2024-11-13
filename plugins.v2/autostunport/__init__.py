@@ -28,6 +28,7 @@ class AutoStunPort(_PluginBase):
 
     # 私有属性
     # ss://YWVzLTI1Ni1nY206NjM3MDg5MjNAMTEyLjEyLjIwNC43MDoxMDc5NQ==
+    _enabled = False
     _ip = None
     _port = None
     _method = None
@@ -35,6 +36,7 @@ class AutoStunPort(_PluginBase):
 
     def init_plugin(self, config: dict = None):
         if config:
+            self._enabled = config.get("enabled")
             self._ip = config.get('ip')
             self._port = config.get('port')
             self._method = config.get('method')
@@ -50,18 +52,21 @@ class AutoStunPort(_PluginBase):
             "summary": "API说明"
         }]
         """
-        return [{
-            "path": "/change_ip_port",
-            "endpoint": self.change_ip_port,
-            "methods": ["GET"],
-            "summary": "更新 ip 以及端口",
-        },
-        {
-            "path": "/get_ip_port",
-            "endpoint": self.get_ip_port,
-            "methods": ["GET"],
-            "summary": "更新 ip 以及端口",
-        }]
+        if self._enabled:
+            return [{
+                "path": "/change_ip_port",
+                "endpoint": self.change_ip_port,
+                "methods": ["GET"],
+                "summary": "更新 ip 以及端口",
+            },
+            {
+                "path": "/get_ip_port",
+                "endpoint": self.get_ip_port,
+                "methods": ["GET"],
+                "summary": "更新 ip 以及端口",
+            }]
+        else:
+            pass
 
     @staticmethod
     def get_command() -> List[Dict[str, Any]]:
@@ -79,7 +84,23 @@ class AutoStunPort(_PluginBase):
                                 'component': 'VCol',
                                 'props': {
                                     'cols': 12,
-                                    'md': 6
+                                    'md': 4
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VSwitch',
+                                        'props': {
+                                            'model': 'enabled',
+                                            'label': '启用插件',
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12,
+                                    'md': 4
                                 },
                                 'content': [
                                     {
@@ -96,7 +117,7 @@ class AutoStunPort(_PluginBase):
                                 'component': 'VCol',
                                 'props': {
                                     'cols': 12,
-                                    'md': 6
+                                    'md': 4
                                 },
                                 'content': [
                                     {
@@ -152,12 +173,12 @@ class AutoStunPort(_PluginBase):
                 ],
             }
         ], {
+            "enabled": False,
             'ip': '',
             '_port': '',
             'method': '',
             'password': ''
         }
-
 
     def change_ip_port(self, apikey: str, ip: str, port: str):
         if apikey != settings.API_TOKEN:
@@ -177,3 +198,12 @@ class AutoStunPort(_PluginBase):
             "ip": self._ip,
             "port": self._port,
         })
+
+    def get_page(self) -> List[dict]:
+        pass
+
+    def get_state(self) -> bool:
+        return self._enable
+
+    def stop_service(self):
+        pass
