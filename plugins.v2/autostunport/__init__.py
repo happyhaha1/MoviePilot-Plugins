@@ -1,6 +1,6 @@
 from typing import List, Tuple, Dict, Any, Optional
 
-
+import base64
 from app import schemas
 from app.core.config import settings
 from app.plugins import _PluginBase
@@ -52,21 +52,18 @@ class AutoStunPort(_PluginBase):
             "summary": "API说明"
         }]
         """
-        if self._enabled:
-            return [{
-                "path": "/change_ip_port",
-                "endpoint": self.change_ip_port,
-                "methods": ["GET"],
-                "summary": "更新 ip 以及端口",
-            },
+        return [{
+            "path": "/change_ip_port",
+            "endpoint": self.change_ip_port,
+            "methods": ["GET"],
+            "summary": "更新 ip 以及端口",
+        },
             {
                 "path": "/get_ip_port",
                 "endpoint": self.get_ip_port,
                 "methods": ["GET"],
-                "summary": "更新 ip 以及端口",
+                "summary": "获取 ip 以及端口",
             }]
-        else:
-            pass
 
     @staticmethod
     def get_command() -> List[Dict[str, Any]]:
@@ -173,11 +170,11 @@ class AutoStunPort(_PluginBase):
                 ],
             }
         ], {
-            "enabled": False,
-            'ip': '',
-            '_port': '',
-            'method': '',
-            'password': ''
+            "enabled": self._enabled,
+            'ip': self._ip,
+            '_port': self._port,
+            'method': self._method,
+            'password': self._password
         }
 
     def change_ip_port(self, apikey: str, ip: str, port: str):
@@ -190,20 +187,21 @@ class AutoStunPort(_PluginBase):
             "port": self._port,
         }
         self.update_config(config=config)
+        return schemas.Response(success=True)
 
     def get_ip_port(self, apikey: str):
         if apikey != settings.API_TOKEN:
             return schemas.Response(success=False, message="API密钥错误")
-        return schemas.Response(success=True, data={
-            "ip": self._ip,
-            "port": self._port,
-        })
+        url = f"{self._method}:{self._password}@{self._ip}:{self._port}"
+        # base64编码
+        url_base64 = base64.b64encode(url.encode('utf-8')).decode('utf-8')
+        return f"ss://{url_base64}#stun回家"
 
     def get_page(self) -> List[dict]:
         pass
 
     def get_state(self) -> bool:
-        return self._enable
+        return self._enabled
 
     def stop_service(self):
         pass
