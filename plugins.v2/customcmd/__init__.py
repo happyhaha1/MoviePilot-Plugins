@@ -11,21 +11,21 @@ from app.log import logger
 from app.schemas import NotificationType
 
 
-class AutoStunPort(_PluginBase):
+class CustomCmd(_PluginBase):
     # 插件名称
-    plugin_name = "自动Stun端口"
+    plugin_name = "自用命令行"
     # 插件描述
-    plugin_desc = "使用lucky进行stun 端口映射，返回最新的 stun 端口"
+    plugin_desc = "自用的命令行工具"
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/happyhaha1/MoviePilot-Plugins/refs/heads/main/icons/lucky.png"
     # 插件版本
-    plugin_version = "1.2"
+    plugin_version = "1.0"
     # 插件作者
     plugin_author = "happyhaha"
     # 作者主页
     author_url = "https://github.com/happyhaha1"
     # 插件配置项ID前缀
-    plugin_config_prefix = "autostun_"
+    plugin_config_prefix = "customcmd_"
     # 加载顺序
     plugin_order = 4
     # 可使用的用户级别

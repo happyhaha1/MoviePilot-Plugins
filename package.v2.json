@@ -11,5 +11,17 @@
             "v1.2": "增加icon",
             "v1.1": "增加订阅通知"
         }
+    },
+    "CustomCmd": {
+        "name": "自用命令",
+        "description": "自用命令",
+        "labels": "cmd",
+        "version": "1.0",
+        "icon": "https://raw.githubusercontent.com/happyhaha1/MoviePilot-Plugins/refs/heads/main/icons/lucky.png",
+        "author": "happyhaha",
+        "level": 1,
+        "history": {
+            "v1.0": "初始化项目"
+        }
     }
 }
