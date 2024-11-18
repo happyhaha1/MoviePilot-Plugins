@@ -3,7 +3,7 @@
         "name": "自动Stun端口",
         "description": "使用lucky进行stun 端口映射，返回最新的 stun 端口",
         "labels": "stun",
-        "version": "1.1",
+        "version": "1.2",
         "icon": "https://raw.githubusercontent.com/happyhaha1/MoviePilot-Plugins/refs/heads/main/icons/lucky.png",
         "author": "happyhaha",
         "level": 1,
