@@ -213,7 +213,7 @@ class AutoStunPort(_PluginBase):
         self._port = port
 
         self._update_config()
-        self.post_message(mtype=NotificationType.Plugin,title=f"【自动更新STUN端口】", text=f"STUN 端口变更为{self._ip}:{self._port}")
+        self.post_message(mtype=NotificationType.Plugin, title=f"【自动更新STUN端口】", text=f"STUN 端口变更为{self._ip}:{self._port}")
         logger.info(f"Stun服务已更新为 {self._ip}:{self._port}")
         # 发送 http 请求
         if self._sub_store_url:
