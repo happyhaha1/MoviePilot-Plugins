@@ -1,0 +1,7 @@
+[project]
+name = "moviepilot-plugin-customcmd"
+dynamic = ["version"]
+requires-python = ">=3.12"
+dependencies = [
+    "pyikuai~=0.4.0.dev0",
+]

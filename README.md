@@ -6,8 +6,9 @@ MoviePilot官方插件市场：https://github.com/jxxghp/MoviePilot-Plugins
 
 
 ### 1. 目录结构
-- 插件仓库需要保持与本项目一致的目录结构（建议fork后修改），仅支持Github仓库，`plugins`存放插件代码，一个插件一个子目录，**子目录名必须为插件类名的小写**，插件主类在`__init__.py`中编写。
-- `package.json`为插件仓库中所有插件概要信息，用于在MoviePilot的插件市场显示，其中版本号等需与插件代码保持一致，通过修改版本号可触发MoviePilot显示插件更新。 
+- 当前 V3 插件放在 `plugins.v3`，市场索引使用 `package.v3.json`；一个插件一个子目录，**子目录名必须为插件类名的小写**，插件主类在 `__init__.py` 中编写。
+- `plugins.v2` 和 `package.v2.json` 仅保留历史 V2 实现。V3 专用实现的 `plugin_version`、索引 `version` 和最新 `history` 必须保持一致，并声明 `system_version: ">=3.0.0"`。
+- `package.json` 是默认/历史版本索引。完整 V3 开发规范请参阅 [MoviePilot V3 插件开发指南](https://github.com/jxxghp/MoviePilot-Plugins/blob/main/docs/Plugin_Development.md)。
 
 ### 2. 插件图标
 - 插件图标可复用官方插件库中`icons`下已有图标，否则需使用完整的http格式的url图片链接（包括package.json中的icon和插件代码中的plugin_icon）。
@@ -125,9 +126,9 @@ class EventType(Enum):
         "description": "刷新对应域名的站点数据", // API描述
     }]
     ```
-  注意：在插件中暴露API接口时注意安全控制，推荐使用`settings.API_TOKEN`进行身份验证。
+  注意：V3 插件应在路由声明中使用 `"auth": "apikey"` 或 `"auth": "bear"`，由宿主统一完成身份验证；不要在业务方法中重复校验 `settings.API_TOKEN`。
   
-- 在对应的方法中实现API响应方法逻辑，通过 `http://localhost:3001/docs` 查看API文档和调试
+- 在对应的方法中实现 API 响应逻辑。V3 插件 API 最终路径为 `/api/v1/plugin/<PluginID>/<path>`，可通过 `http://localhost:3001/docs` 查看并调试。
 
 ### 4. 如何在插件中注册公共定时服务？
 - 注册公共定时服务后，可以在`设定-服务`中查看运行状态和手动启动，更加便捷。
@@ -494,19 +495,15 @@ def get_dashboard(self, key: str, **kwargs) -> Optional[Tuple[Dict[str, Any], Di
 ```
 
 ### 9. 如何发布插件版本？
-- 修改插件代码后，需要修改`package.json`中的`version`版本号，MoviePilot才会提示用户有更新，注意版本号需要与`__init__.py`文件中的`plugin_version`保持一致。
-- `package.json`中的`level`用于定义插件用户可见权限，`1`为所有用户可见，`2`为仅认证用户可见，`3`为需要密钥才可见（一般用于测试）。如果插件功能需要使用到站点则应该为2，否则即使插件对用户可见但因为用户未认证相关功能也无法正常使用。
-- `package.json`中的`history`用于记录插件更新日志，格式如下：
-```json
-{
-  "history": {
-    "v1.8": "修复空目录删除逻辑",
-    "v1.7": "增加定时清理空目录功能"
-  }
-}
-```
-- 新增加的插件请配置在`package.json`中的末尾，这样可被识别为最新增加，可用于用户排序。
+- V3 插件的元数据写入 `package.v3.json`；修改代码后同步更新插件类中的 `plugin_version`、索引中的 `version` 和最新的 `history`，并声明 `system_version: ">=3.0.0"`。
+- `level` 用于定义插件用户可见权限，`1` 为所有用户可见，`2` 为仅认证用户可见，`3` 为需要密钥才可见。
+- V1/V2 历史实现分别继续维护 `package.json`、`package.v2.json`，不要用 V3 代码覆盖旧目录。
 
-### 10. 如何开发V2版本的插件以及实现插件多版本兼容？
+### 10. 如何开发V3版本的插件？
+
+- 将插件放在 `plugins.v3/<插件类名小写>/__init__.py`，并在 `package.v3.json` 中添加同名 ID。
+- 详细规范请参阅 [MoviePilot V3 插件开发指南](https://github.com/jxxghp/MoviePilot-Plugins/blob/main/docs/Plugin_Development.md) 和 [V2 插件迁移到 V3](https://github.com/jxxghp/MoviePilot-Plugins/blob/main/docs/V3_Plugin_Adaptation.md)。
+
+### 11. 如何继续维护V2版本插件？
 
 - 请参阅 [V2版本插件开发指南](./docs/V2_Plugin_Development.md)

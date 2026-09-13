@@ -1,0 +1,28 @@
+{
+  "AutoStunPort": {
+    "name": "自动Stun端口",
+    "description": "使用lucky进行stun 端口映射，返回最新的 stun 端口",
+    "labels": "stun",
+    "version": "3.0.0",
+    "icon": "https://raw.githubusercontent.com/happyhaha1/MoviePilot-Plugins/refs/heads/main/icons/lucky.png",
+    "author": "happyhaha",
+    "level": 1,
+    "system_version": ">=3.0.0",
+    "history": {
+      "v3.0.0": "适配 MoviePilot V3，迁移至稳定 SDK，并规范插件 API 响应。"
+    }
+  },
+  "CustomCmd": {
+    "name": "自用命令行",
+    "description": "自用的命令行工具",
+    "labels": "cmd",
+    "version": "3.0.0",
+    "icon": "https://raw.githubusercontent.com/xushier/HD-Icons/refs/heads/main/border-radius/Cloudcmd_A.png",
+    "author": "happyhaha",
+    "level": 1,
+    "system_version": ">=3.0.0",
+    "history": {
+      "v3.0.0": "适配 MoviePilot V3，迁移事件与日志至稳定 SDK。"
+    }
+  }
+}

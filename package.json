@@ -7,6 +7,7 @@
     "icon": "https://raw.githubusercontent.com/happyhaha1/MoviePilot-Plugins/refs/heads/main/icons/lucky.png",
     "author": "happyhaha",
     "level": 1,
+    "v3": false,
     "history": {
       "v1.2": "增加icon",
       "v1.1": "增加订阅通知"
