@@ -24,5 +24,18 @@
     "history": {
       "v3.0.0": "适配 MoviePilot V3，迁移事件与日志至稳定 SDK。"
     }
+  },
+  "FnosMetaRefresh": {
+    "name": "飞牛元数据刷新",
+    "description": "定时刷新飞牛影视媒体库元数据，支持按近N天入库条目或按媒体库刷新。",
+    "labels": "媒体服务器",
+    "version": "3.0.0",
+    "icon": "https://raw.githubusercontent.com/jxxghp/MoviePilot-Plugins/main/icons/refresh2.png",
+    "author": "happyhaha",
+    "level": 1,
+    "system_version": ">=3.0.0",
+    "history": {
+      "v3.0.0": "首个版本，支持按入库条目与按媒体库两种粒度刷新飞牛影视元数据。"
+    }
   }
 }
